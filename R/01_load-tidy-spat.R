@@ -39,14 +39,21 @@ region <- tribble(
     # filter: qaqc to keep only '<0>', remove na regions
     # mutate: convert year and month into a Date object
     # join: with regions tribble to have region_friendly acronymns
-    # select(-qa_qc_code, region)
+    # select(-qa_qc_code, region) 
+    # mutate: create ordered factor for region
   
 spat <- spat_dat %>% 
   select(year, month, soak_time_days, region, tag_name, stringer, adj_spat, qa_qc_code) %>%
   dplyr::filter(grepl("<0>", qa_qc_code) & !is.na(region)) %>% 
   mutate(soak_month = lubridate::ymd(paste0(year, "-", month, "-01"))) %>% 
   left_join(region, by = 'region') %>% 
-  select(-region, -qa_qc_code)
+  select(-region, -qa_qc_code) %>% 
+  mutate(region_friendly = factor(region_friendly, 
+                                  levels = c('TR',
+                                             'GR', 
+                                             'SA',
+                                             'SR',
+                                             'FM')))
 
 rm(region) # get rid of the region shortened tribble
 
