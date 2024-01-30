@@ -63,3 +63,38 @@ dat %>%
   geom_errorbar(aes(ymin = spat_count_region - spat_count_se, ymax = spat_count_region + spat_count_se)) +
   facet_wrap(~year, ncol = 1) +
   theme_classic()
+
+
+# plot of annual sums by region with SE bars ------------------------------
+
+dat %>% 
+  mutate(year = lubridate::year(soak_month)) %>% 
+  group_by(year, region_friendly) %>% 
+  summarize(mean = mean(spat_count_region, na.rm = T),
+            se = (sd(spat_count_region, na.rm = T)/sqrt(length(spat_count_region)))) %>% 
+  ggplot(aes(x = year, y = mean)) +
+  geom_bar(aes(fill = region_friendly, color = region_friendly),
+           stat = "identity", width = 0.5) +
+  geom_errorbar(aes(x = year, ymin = mean - se, ymax = mean + se), width = 0.4) +
+  facet_grid(rows = vars(region_friendly), scales = "free_y") +
+  scale_fill_manual(values = sitecolours) +
+  scale_color_manual(values = sitecolours) +
+  scale_x_continuous(breaks = c(2015, 2016, 2017, 2018, 2019, 2020)) +
+  theme_bw() +
+  theme(legend.position = "none",
+        axis.text = element_text(color = "black")) +
+  labs(x = "", y = "Mean annual spat settlement")
+
+dat %>% 
+  mutate(year = lubridate::year(soak_month)) %>% 
+  group_by(year, region_friendly) %>% 
+  summarize(mean = mean(spat_count_region, na.rm = T),
+            se = (sd(spat_count_region, na.rm = T)/sqrt(length(spat_count_region)))) %>% 
+  ggplot(aes(x = year, y = mean)) +
+  geom_bar(fill = "white", stat = "identity", color = "black", width = 0.5) +
+  geom_errorbar(aes(x = year, ymin = mean - se, ymax = mean + se), width = 0.4) +
+  facet_grid(rows = vars(region_friendly), scales = "free_y") +
+  scale_x_continuous(breaks = c(2015, 2016, 2017, 2018, 2019, 2020)) +
+  theme_bw() +
+  theme(axis.text = element_text(color = "black")) +
+  labs(x = "", y = "Mean annual spat settlement")
