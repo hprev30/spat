@@ -18,6 +18,10 @@ library(weathermetrics) # functions to convert between weather metrics
 library(broom) # convert statistical analysis objects into tidy tibbles
 library(psych)
 # library(wql)
+library(glmmTMB)
+library(AICcmodavg)
+library(bbmle)
+library(DHARMa)
 
 # 04 markdown ----
 # library(knitr)
@@ -30,3 +34,4 @@ library(plotly) # create interactive web graphics - use for html output files
 library(gganimate) # create animated web graphics
 library(gghighlight) # allows for highlighting flexibility in ggplot2
 library(ggthemes) # colorblind palettes
+library(ggdist)

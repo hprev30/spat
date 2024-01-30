@@ -35,7 +35,7 @@ region <- tribble(
 # plan to be wrangle and tidied:
 
   # generic `spat` dataframe:
-    # select: year, month, soak time, regions, tag name, stringer, adj_spat, qaqc
+    # select: year, month, soak time, regions, reef name, stringer, adj_spat, qaqc
     # filter: qaqc to keep only '<0>', remove na regions
     # mutate: convert year and month into a Date object
     # join: with regions tribble to have region_friendly acronymns
@@ -43,7 +43,7 @@ region <- tribble(
     # mutate: create ordered factor for region
   
 spat <- spat_dat %>% 
-  select(year, month, soak_time_days, region, tag_name, stringer, adj_spat, qa_qc_code) %>%
+  select(year, month, soak_time_days, region, reef_name, stringer, adj_spat, qa_qc_code) %>%
   dplyr::filter(grepl("<0>", qa_qc_code) & !is.na(region)) %>% 
   mutate(soak_month = lubridate::ymd(paste0(year, "-", month, "-01"))) %>% 
   left_join(region, by = 'region') %>% 
@@ -62,15 +62,19 @@ rm(region) # get rid of the region shortened tribble
     # remove duplicates: dplyr::distinct()
 
 soakdays <- spat %>% 
-    select(soak_month, tag_name, region_friendly, soak_time_days) %>% 
+    select(soak_month, reef_name, region_friendly, soak_time_days) %>% 
     dplyr::distinct()
 
 
 # 04 tidy data ------------------------------------------------------------
 
   # `dat` dataframe for spat analysis
-    # group_by: soak_month and region_friendly and tag_name
-    # summarize: spat_count = mean(adj_spat, na.rm = T) to get average spat counted on each tag (e.g. averaging the stringers)
+    # group_by: soak_month and region_friendly and reef_name
+    # summarize: spat_count = sum(adj_spat, na.rm = T) to get total spat counted on each tree (e.g. totaling the stringers)
+    # group_by: soak_month and region_friendly
+    # summarize and round: spat_count_region = mean(spat_count, na.rm = T) to get average 
+    # 
+# to standardize by soak days
     # left_join with soak days by retrieval_date, region_friendly, tag_name # to be able to bring back in soak_time_days
     # mutate: spat_std = spat_count/soak_time_days # to get a new variable
     # group_by: retrieval_date and region_friendly
@@ -79,26 +83,30 @@ soakdays <- spat %>%
     #               spat_count_se = (sd(spat_count, na.rm = T)/sqrt(length(spat_count))) 
 
 dat <- spat %>% 
-  group_by(soak_month, region_friendly, tag_name) %>% 
-  summarize(spat_count = mean(adj_spat, na.rm = T)) %>% 
+  group_by(soak_month, region_friendly, reef_name) %>% 
+  summarize(spat_count = sum(adj_spat, na.rm = T)) %>% 
   group_by(soak_month, region_friendly) %>% 
-  summarise(spat_count_region = mean(spat_count, na.rm = T),
-            spat_count_sd = sd(spat_count, na.rm = T),
-            spat_count_se = (sd(spat_count, na.rm = T)/sqrt(length(spat_count)))
-  ) %>% 
+  summarise(spat_count_region = ceiling(mean(spat_count, na.rm = T)),
+            spat_count_sd = ceiling(sd(spat_count, na.rm = T)),
+            spat_count_se = ceiling((sd(spat_count, na.rm = T)/sqrt(length(spat_count))))
+            ) %>% 
   ungroup()
 
 dat_soak <-  spat %>% 
-  group_by(soak_month, region_friendly, tag_name) %>% 
-  summarize(spat_count = mean(adj_spat, na.rm = T)) %>% 
-  left_join(soakdays, by = c('soak_month', 'region_friendly', 'tag_name')) %>% 
+  group_by(soak_month, region_friendly, reef_name) %>% 
+  summarize(spat_count = sum(adj_spat, na.rm = T)) %>%  
+  left_join(soakdays, by = c('soak_month', 'region_friendly', 'reef_name')) %>% 
   mutate(spat_std = spat_count/soak_time_days) %>% 
   group_by(soak_month, region_friendly) %>% 
-  summarise(spat_std_count_region = mean(spat_std, na.rm = T),
-            spat_std_count_sd = sd(spat_std, na.rm = T),
-            spat_std_count_se = (sd(spat_std, na.rm = T)/sqrt(length(spat_count)))
-  ) %>% 
+  summarise(spat_std_count_region = ceiling(mean(spat_std, na.rm = T)),
+            spat_std_count_sd = ceiling(sd(spat_std, na.rm = T)),
+            spat_std_count_se = ceiling((sd(spat_std, na.rm = T)/sqrt(length(spat_std))))
+            ) %>% 
   ungroup()
 
+
 rm(soakdays) # remove soakdays dataframe   
+
+
+# 05 create basic summary stat tables -------------------------------------
 
