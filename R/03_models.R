@@ -40,7 +40,7 @@ names(modset) <- modnames2
 # create model selection table
 bbmle::AICctab(modset, weights = TRUE)
 
-AICcmodavg::aictab(modset, modnames2, second.ord = FALSE) #model selection table with AIC
+# AICcmodavg::aictab(modset, modnames2, second.ord = FALSE) #model selection table with AIC
 AICcmodavg::aictab(modset, modnames2, second.ord = TRUE) #model selection table with AICc
 
 #check autocorrelation issues
