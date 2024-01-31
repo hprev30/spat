@@ -4,7 +4,7 @@ source(here('R', '00_load-packages.R'))
 source(here('R', '00_vis-custom.R'))
 source(here('R', '01_load-tidy-spat.R'))
 
-glimpse(spat)
+# glimpse(spat)
 
 # generalized linear models -----------------------------------------------
 spat <- spat %>% mutate(region = as.character(region_friendly)) # make region just a character variable, rather than ordered
