@@ -28,7 +28,7 @@ dat_soak %>%
        y = "Mean Standardized Spat Per Region")
 
 
-# create overall plot over time -------------------------------------------
+# create plot over time -------------------------------------------
 
 dat_soak %>% 
   ggplot(aes(x = soak_month, y = spat_std_count_region, group = region_friendly, color = region_friendly)) +
