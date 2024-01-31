@@ -6,7 +6,7 @@
 
 spat_dat <- readxl::read_xlsx(here('data','spat_data.xlsx'), sheet = 'GTM') %>% 
               janitor::clean_names() %>% # clean variable names
-                select(1:25) # remove extra columns present in excel file
+                select(1:26) # remove extra columns present in excel file
 
 
 
@@ -43,8 +43,8 @@ region <- tribble(
     # mutate: create ordered factor for region
   
 spat_dat2 <- spat_dat %>% 
-  select(year, month, soak_time_days, region, reef_name, stringer, adj_spat, qa_qc_code) %>%
-  dplyr::filter(grepl("<0>", qa_qc_code) & !is.na(region)) %>% 
+  select(year, month, soak_time_days, region, tree_name_2024, stringer, adj_spat, qa_qc_code) %>%
+  dplyr::filter(grepl("<0>", qa_qc_code) & !is.na(region) & !is.na(tree_name_2024)) %>% 
   mutate(soak_month = lubridate::ymd(paste0(year, "-", month, "-01"))) %>% 
   left_join(region, by = 'region') %>% 
   select(-region, -qa_qc_code) %>% 
@@ -54,7 +54,7 @@ spat_dat2 <- spat_dat %>%
                                              'SA',
                                              'SR',
                                              'FM'))) %>% 
-  rename(tree = reef_name)
+  rename(tree = tree_name_2024)
 
 rm(region) # get rid of the region shortened tribble
 
@@ -91,6 +91,27 @@ spat <- spat_dat2 %>%
   #           spat_count_se = ceiling((sd(spat_count, na.rm = T)/sqrt(length(spat_count))))
   #           ) %>% 
   # ungroup()
+
+
+# check sampling design ---------------------------------------------------
+
+# check to see whether to keep SA2 or SA4
+# SA2 was sampled starting in Feb 2018, but SA4 is farther up San Sebastian river than the other two sites, but sampled for longer
+spat %>% 
+  filter(region_friendly == "SA") %>% 
+  ggplot(aes(x = tree, y = spat_std)) +
+  geom_point(position = "jitter") +
+  geom_boxplot()
+
+spat %>% 
+  filter(region_friendly == "SA") %>% 
+  group_by(tree) %>% 
+  summarize(mean = mean(spat_std, na.rm = T),
+            sd = sd(spat_std, na.rm = T))
+
+# removing the sampled tree with the shorter timeseries "SA2"
+
+spat <- spat %>% filter(tree != "SA2")
 
 rm(soakdays) # remove soakdays dataframe   
 
