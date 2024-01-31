@@ -81,7 +81,8 @@ spat <- spat_dat2 %>%
   group_by(soak_month, region_friendly, tree) %>% 
   summarize(spat_count = ceiling(mean(adj_spat, na.rm = T))) %>% # gives average spat per shell per tree rounded to integer
   left_join(soakdays, by = c('soak_month', 'region_friendly', 'tree')) %>%
-  mutate(spat_std = ceiling(spat_count/soak_time_days)) %>%  # gives average spat per shell per tree per deployment period rounded to integer
+  mutate(spat_std = ceiling(spat_count/soak_time_days), # gives average spat per shell per tree per deployment period rounded to integer
+         year = lubridate::year(soak_month)) %>%  # creates a year variable
   ungroup()
 
   # group_by(soak_month, region_friendly) %>% 
