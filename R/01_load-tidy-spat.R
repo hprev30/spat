@@ -42,7 +42,7 @@ region <- tribble(
     # select(-qa_qc_code, region) 
     # mutate: create ordered factor for region
   
-spat <- spat_dat %>% 
+spat_dat2 <- spat_dat %>% 
   select(year, month, soak_time_days, region, reef_name, stringer, adj_spat, qa_qc_code) %>%
   dplyr::filter(grepl("<0>", qa_qc_code) & !is.na(region)) %>% 
   mutate(soak_month = lubridate::ymd(paste0(year, "-", month, "-01"))) %>% 
@@ -53,7 +53,8 @@ spat <- spat_dat %>%
                                              'GR', 
                                              'SA',
                                              'SR',
-                                             'FM')))
+                                             'FM'))) %>% 
+  rename(tree = reef_name)
 
 rm(region) # get rid of the region shortened tribble
 
@@ -61,52 +62,36 @@ rm(region) # get rid of the region shortened tribble
     # select: retrieval_date, tag_name, region_friendly, soak_time_days
     # remove duplicates: dplyr::distinct()
 
-soakdays <- spat %>% 
-    select(soak_month, reef_name, region_friendly, soak_time_days) %>% 
+soakdays <- spat_dat2 %>% 
+    select(soak_month, tree, region_friendly, soak_time_days) %>% 
     dplyr::distinct()
 
 
 # 04 tidy data ------------------------------------------------------------
 
-  # `dat` dataframe for spat analysis
-    # group_by: soak_month and region_friendly and reef_name
-    # summarize: spat_count = sum(adj_spat, na.rm = T) to get total spat counted on each tree (e.g. totaling the stringers)
-    # group_by: soak_month and region_friendly
-    # summarize and round: spat_count_region = mean(spat_count, na.rm = T) to get average 
-    # 
+  # `spat` dataframe for spat analysis
+    # group_by: soak_month and region_friendly and tree
+    # summarize: spat_count = ceiling(mean(adj_spat, na.rm = T)) to get average spat per shell per tree rounded to integer
 # to standardize by soak days
-    # left_join with soak days by retrieval_date, region_friendly, tag_name # to be able to bring back in soak_time_days
-    # mutate: spat_std = spat_count/soak_time_days # to get a new variable
-    # group_by: retrieval_date and region_friendly
-    # summarize: spat_count_region = mean(spat_count, na.rm = T), 
-    #             spat_count_sd = sd(spat_count, na.rm = T), 
-    #               spat_count_se = (sd(spat_count, na.rm = T)/sqrt(length(spat_count))) 
+    # left_join with soak days by retrieval_date, region_friendly, tree to be able to bring back in `soak_time_days` from original df
+    # mutate: spat_std = ceiling(spat_count/soak_time_days) # to get a new variable of average spat per shell per tree per deployment period rounded to integer
+    # ungroup dataframe
 
-dat <- spat %>% 
-  group_by(soak_month, region_friendly, reef_name) %>% 
-  summarize(spat_count = sum(adj_spat, na.rm = T)) %>% 
-  group_by(soak_month, region_friendly) %>% 
-  summarise(spat_count_region = ceiling(mean(spat_count, na.rm = T)),
-            spat_count_sd = ceiling(sd(spat_count, na.rm = T)),
-            spat_count_se = ceiling((sd(spat_count, na.rm = T)/sqrt(length(spat_count))))
-            ) %>% 
+spat <- spat_dat2 %>% 
+  group_by(soak_month, region_friendly, tree) %>% 
+  summarize(spat_count = ceiling(mean(adj_spat, na.rm = T))) %>% # gives average spat per shell per tree rounded to integer
+  left_join(soakdays, by = c('soak_month', 'region_friendly', 'tree')) %>%
+  mutate(spat_std = ceiling(spat_count/soak_time_days)) %>%  # gives average spat per shell per tree per deployment period rounded to integer
   ungroup()
 
-dat_soak <-  spat %>% 
-  group_by(soak_month, region_friendly, reef_name) %>% 
-  summarize(spat_count = sum(adj_spat, na.rm = T)) %>%  
-  left_join(soakdays, by = c('soak_month', 'region_friendly', 'reef_name')) %>% 
-  mutate(spat_std = spat_count/soak_time_days) %>% 
-  group_by(soak_month, region_friendly) %>% 
-  summarise(spat_std_count_region = ceiling(mean(spat_std, na.rm = T)),
-            spat_std_count_sd = ceiling(sd(spat_std, na.rm = T)),
-            spat_std_count_se = ceiling((sd(spat_std, na.rm = T)/sqrt(length(spat_std))))
-            ) %>% 
-  ungroup()
-
+  # group_by(soak_month, region_friendly) %>% 
+  # summarise(spat_count_region = ceiling(mean(spat_count, na.rm = T)),
+  #           spat_count_sd = ceiling(sd(spat_count, na.rm = T)),
+  #           spat_count_se = ceiling((sd(spat_count, na.rm = T)/sqrt(length(spat_count))))
+  #           ) %>% 
+  # ungroup()
 
 rm(soakdays) # remove soakdays dataframe   
 
-
-# 05 create basic summary stat tables -------------------------------------
-
+# remove extra datasets for ease of running this code as a source
+rm(spat_dat, spat_dat2)
