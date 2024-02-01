@@ -33,7 +33,7 @@ ggplot(spat, aes(x = region_friendly, y = spat_std)) +
 
 # merge models into one list
 modset = list(mod.0,mod.1,mod.2,mod.3)
-modnames2 = c("region", "region + year", "region * year", "year")
+modnames2 = c("spat ~ region", "spat ~ region + year", "spat ~ region + year + region * year", "spat ~ year")
 names(modset) <- modnames2
 
 #AIC(c) table of all models
