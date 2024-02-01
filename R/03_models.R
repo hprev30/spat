@@ -7,7 +7,7 @@ source(here('R', '01_load-tidy-spat.R'))
 # glimpse(spat)
 
 # generalized linear models -----------------------------------------------
-spat <- spat %>% mutate(region = as.character(region_friendly)) # make region just a character variable, rather than ordered
+spat <- spat %>% mutate(year = factor(year)) %>% rename(region = region_friendly) # make year a factor and rename region to shorten
 
 # region
 mod.0 <- glmmTMB::glmmTMB(spat_std ~ region, data = spat, family = "nbinom2")
