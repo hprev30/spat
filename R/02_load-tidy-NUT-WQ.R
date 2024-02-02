@@ -14,7 +14,9 @@ fun_in <- function(x) median(x, na.rm = TRUE)
 
 pi <- SWMPr::import_local(here('data', 'swmp','59698.zip'), 
                           station_code = 'gtmpiwq') %>% 
-  SWMPr::qaqc(qaqc_keep = c('0', '2', '3', '4', '5')) %>% 
+  SWMPr::qaqc(qaqc_keep = c('0', '2', '3', '4', '5')) 
+
+pi_max <- %>% 
   SWMPr::aggreswmp(by = "months", FUN = fun_in, params = c('temp', 'sal', 'turb'))
 
 
