@@ -22,6 +22,8 @@ library(glmmTMB)
 library(AICcmodavg)
 library(bbmle)
 library(DHARMa)
+library(car)
+library(emmeans)
 
 # 04 markdown ----
 # library(knitr)
@@ -36,3 +38,4 @@ library(gghighlight) # allows for highlighting flexibility in ggplot2
 library(ggthemes) # colorblind palettes
 library(ggdist)
 library(ggrepel)
+library(ggeffects)
