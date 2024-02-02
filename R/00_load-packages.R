@@ -36,6 +36,4 @@ library(plotly) # create interactive web graphics - use for html output files
 library(gganimate) # create animated web graphics
 library(gghighlight) # allows for highlighting flexibility in ggplot2
 library(ggthemes) # colorblind palettes
-library(ggdist)
 library(ggrepel)
-library(ggeffects)
