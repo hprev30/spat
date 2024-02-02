@@ -12,16 +12,16 @@ spat %>%
             se = (sd(spat_count, na.rm = T)/sqrt(length(spat_count)))
   ) %>% 
   ggplot(aes(x = soak_month, y = mean, group = region_friendly, color = region_friendly)) +
-  geom_point(size = 2) +
+  geom_point() +
   geom_errorbar(aes(ymin = mean - se, ymax = mean + se), alpha = 0.7) +
   facet_grid(~ year(soak_month), space="free_x", scales="free_x", switch="x") +
   scale_colour_manual(name = "Region", values = sitecolours) +
   scale_x_date(date_breaks = "months", date_labels = "%b") +
-  theme_classic() +
+  theme_classic(base_family = "serif") +
   theme(legend.position = "top",
         strip.placement = "outside",
         strip.background = element_blank(),
-        axis.text.x = element_text(angle = 90, vjust = 0.4),
+        axis.text.x = element_text(angle = 90, vjust = 0.4, size = 9),
         axis.text = element_text(color = "black")) +
   labs(x = "", y = "Mean Spat Per Shell")
 
