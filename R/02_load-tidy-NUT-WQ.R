@@ -10,31 +10,21 @@
 # load data, qaqc to remove suspect or rejected values
 # aggregate data to monthly medians for temp, sal, turb
 
-fun_in <- function(x) median(x, na.rm = TRUE)
-
 pi <- SWMPr::import_local(here('data', 'swmp','59698.zip'), 
                           station_code = 'gtmpiwq') %>% 
   SWMPr::qaqc(qaqc_keep = c('0', '2', '3', '4', '5')) 
 
-pi_max <- %>% 
-  SWMPr::aggreswmp(by = "months", FUN = fun_in, params = c('temp', 'sal', 'turb'))
-
-
 ss <- SWMPr::import_local(here('data', 'swmp','59698.zip'), 
                           station_code = 'gtmsswq') %>% 
-  SWMPr::qaqc(qaqc_keep = c('0', '2', '3', '4', '5')) %>% 
-  SWMPr::aggreswmp(by = "months", FUN = fun_in, params = c('temp', 'sal', 'turb'))
-
+  SWMPr::qaqc(qaqc_keep = c('0', '2', '3', '4', '5'))  
 
 fm <- SWMPr::import_local(here('data', 'swmp','59698.zip'), 
                           station_code = 'gtmfmwq') %>% 
-  SWMPr::qaqc(qaqc_keep = c('0', '2', '3', '4', '5')) %>% 
-  SWMPr::aggreswmp(by = "months", FUN = fun_in, params = c('temp', 'sal', 'turb'))
-
+  SWMPr::qaqc(qaqc_keep = c('0', '2', '3', '4', '5')) 
 
 # 02 load swmp NUT data ---------------------------------------------------
 
-## 02.1 load 2002-2023 Nutrient Data ----
+## 02.1 load 2002-2023 Nutrient Data 
 
 nms <- names(read_excel(here::here('data',
                                    'swmp',
@@ -58,11 +48,11 @@ NUT <- readxl::read_xlsx(here::here('data',
 # clean environment
 rm(nms, class, class2)
 
-## 02.2 wrangle data for merging ----
+## 02.2 wrangle data for merging 
 
 NUT <- NUT %>% filter(!is.na(rep)) # remove "S" reps in dataset
 
-## 02.3 wrangle NUT to swmpr for better filtering ----
+## 02.3 wrangle NUT to swmpr for better filtering 
 # The `swmpr()` call needs to have just datetimestamp and data+qa columns, so remove the extras, while also making names lower case.
 
 timezone <- "America/Jamaica" # needs a timezone
@@ -98,7 +88,7 @@ for (i in 1:length(stations)){
 
 rm(timezone, stations)
 
-## 02.4 qaqc swmpr -----
+## 02.4 qaqc swmpr 
 
 # use the qaqc functions on the data
 # aggregate to monthly for chla
@@ -125,32 +115,136 @@ rm(swmp_gtmpinut,
    swmp_gtmfmnut,
    swmp_gtmpcnut)
 
-# 03 merge NUT with WQ files and region_friendly --------------------------
+# 03 wq stats by station --------------------------------------------------
 
-TR <- pi %>% left_join(pi_chla, by = "datetimestamp") %>% mutate(region_friendly = "TR")
-GR <- pi %>% left_join(pi_chla, by = "datetimestamp") %>% mutate(region_friendly = "GR")
+# im sure there is a way to make this all into one nice beautiful function, 
+# but I just don't have the patience for it right now
+fun_max <- function(x) max(x, na.rm = TRUE)
+fun_min <- function(x) min(x, na.rm = TRUE)
+fun_se <- function(x) (sd(x, na.rm = TRUE)/sqrt(length(x)))
+fun_med <- function(x) median(x, na.rm = TRUE)
 
-SA <- ss %>% left_join(ss_chla, by = "datetimestamp") %>% mutate(region_friendly = "SA")
-SR <- ss %>% left_join(ss_chla, by = "datetimestamp") %>% mutate(region_friendly = "SR")
+  max <- pi %>% SWMPr::aggreswmp(by = "months", FUN = fun_max, 
+                                    params = c('temp', 'sal', 'turb')) %>% 
+    rename(temp_max = temp,
+           sal_max = sal,
+           turb_max = turb)
+  min <- pi %>% SWMPr::aggreswmp(by = "months", FUN = fun_min, 
+                                    params = c('temp', 'sal', 'turb')) %>% 
+    rename(temp_min = temp,
+           sal_min = sal,
+           turb_min = turb)
+  mean <- pi %>% SWMPr::aggreswmp(by = "months", 
+                                     params = c('temp', 'sal', 'turb')) %>% 
+    rename(temp_mean = temp,
+           sal_mean = sal,
+           turb_mean = turb)
+  se <- pi %>% SWMPr::aggreswmp(by = "months", FUN = fun_se, 
+                                   params = c('temp', 'sal', 'turb')) %>% 
+    rename(temp_se = temp,
+           sal_se = sal,
+           turb_se = turb) 
 
-FM <- fm %>% left_join(fm_chla, by = "datetimestamp") %>% mutate(region_friendly = "FM")
+pi_dat <- max %>% 
+  left_join(min, by = "datetimestamp") %>% 
+  left_join(mean, by = "datetimestamp") %>% 
+  left_join(se, by = "datetimestamp") %>% 
+  mutate(station = "piwq")
 
+rm(max, mean, min, se)
 
-# 04 combine into one df --------------------------------------------------
+####
 
-wq <- bind_rows(TR, GR, SA, SR, FM) %>% 
-  mutate(region_friendly = factor(region_friendly, 
-                                  levels = c('TR',
-                                             'GR', 
-                                             'SA',
-                                             'SR',
-                                             'FM'))) %>% 
-  rename(soak_month = datetimestamp)
+max <- ss %>% SWMPr::aggreswmp(by = "months", FUN = fun_max, 
+                               params = c('temp', 'sal', 'turb')) %>% 
+  rename(temp_max = temp,
+         sal_max = sal,
+         turb_max = turb)
+min <- ss %>% SWMPr::aggreswmp(by = "months", FUN = fun_min, 
+                               params = c('temp', 'sal', 'turb')) %>% 
+  rename(temp_min = temp,
+         sal_min = sal,
+         turb_min = turb)
+mean <- ss %>% SWMPr::aggreswmp(by = "months", 
+                                params = c('temp', 'sal', 'turb')) %>% 
+  rename(temp_mean = temp,
+         sal_mean = sal,
+         turb_mean = turb)
+se <- ss %>% SWMPr::aggreswmp(by = "months", FUN = fun_se, 
+                              params = c('temp', 'sal', 'turb')) %>% 
+  rename(temp_se = temp,
+         sal_se = sal,
+         turb_se = turb) 
 
+ss_dat <- max %>% 
+  left_join(min, by = "datetimestamp") %>% 
+  left_join(mean, by = "datetimestamp") %>% 
+  left_join(se, by = "datetimestamp") %>% 
+  mutate(station = "sswq")
 
-# 05 clean up all dfs -----------------------------------------------------
+rm(max, mean, min, se)
 
-rm(fm, FM, fm_chla,
-   GR, NUT, pi, pi_chla,
-   SA, SR, ss, ss_chla,
-   TR)
+###
+
+max <- fm %>% SWMPr::aggreswmp(by = "months", FUN = fun_max, 
+                               params = c('temp', 'sal', 'turb')) %>% 
+  rename(temp_max = temp,
+         sal_max = sal,
+         turb_max = turb)
+min <- fm %>% SWMPr::aggreswmp(by = "months", FUN = fun_min, 
+                               params = c('temp', 'sal', 'turb')) %>% 
+  rename(temp_min = temp,
+         sal_min = sal,
+         turb_min = turb)
+mean <- fm %>% SWMPr::aggreswmp(by = "months", 
+                                params = c('temp', 'sal', 'turb')) %>% 
+  rename(temp_mean = temp,
+         sal_mean = sal,
+         turb_mean = turb)
+se <- fm %>% SWMPr::aggreswmp(by = "months", FUN = fun_se, 
+                              params = c('temp', 'sal', 'turb')) %>% 
+  rename(temp_se = temp,
+         sal_se = sal,
+         turb_se = turb) 
+
+fm_dat <- max %>% 
+  left_join(min, by = "datetimestamp") %>% 
+  left_join(mean, by = "datetimestamp") %>% 
+  left_join(se, by = "datetimestamp") %>% 
+  mutate(station = "fmwq")
+
+rm(max, mean, min, se)
+
+# 04 merge NUT with WQ files --------------------------
+
+PI <- pi_dat %>% left_join(pi_chla, by = "datetimestamp") %>% rename(date = datetimestamp)
+SS <- ss_dat %>% left_join(ss_chla, by = "datetimestamp") %>% rename(date = datetimestamp)
+FM <- fm_dat %>% left_join(fm_chla, by = "datetimestamp") %>% rename(date = datetimestamp)
+
+WQ <- bind_rows(PI, SS, FM)
+
+rm(PI, SS, FM,
+   pi_dat, ss_dat, fm_dat)
+
+# 05 settlement periods ---------------------------------------------------
+
+settlement <- tribble(
+  ~month, ~settlement,
+  'Jan', 'None',
+  'Feb','None',
+  'Mar', 'None',
+  'Apr', 'Yes',
+  'May', 'Yes',
+  'Jun', 'Yes', 
+  'Jul', 'Yes',
+  'Aug', 'Yes', 
+  'Sep', 'Yes', 
+  'Oct', 'Yes',
+  'Nov', 'None',
+  'Dec', 'None'
+)
+
+pi %>% 
+  select(datetimestamp, temp, sal, turb) %>% 
+  mutate(month = lubridate::month(datetimestamp, label = T)) %>% 
+  left_join(settlement, by = "month")
