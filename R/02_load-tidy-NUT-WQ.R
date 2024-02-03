@@ -244,7 +244,35 @@ settlement <- tribble(
   'Dec', 'None'
 )
 
-pi %>% 
+pi_1 <- pi %>% 
   select(datetimestamp, temp, sal, turb) %>% 
   mutate(month = lubridate::month(datetimestamp, label = T)) %>% 
-  left_join(settlement, by = "month")
+  left_join(settlement, by = "month") %>% 
+  mutate(station = "piwq")
+
+ss_1 <- ss %>% 
+  select(datetimestamp, temp, sal, turb) %>% 
+  mutate(month = lubridate::month(datetimestamp, label = T)) %>% 
+  left_join(settlement, by = "month") %>% 
+  mutate(station = "sswq")
+
+fm_1 <- fm %>% 
+  select(datetimestamp, temp, sal, turb) %>% 
+  mutate(month = lubridate::month(datetimestamp, label = T)) %>% 
+  left_join(settlement, by = "month") %>% 
+  mutate(station = "fmwq")
+
+# settlement_WQ <- bind_rows(pi_1, ss_1, fm_1) %>% 
+#   group_by(station, settlement) 
+
+pi_1 %>% 
+  split(.$settlement) %>% 
+  purrr::map(summary)
+
+ss_1 %>% 
+  split(.$settlement) %>% 
+  purrr::map(summary)
+
+fm_1 %>% 
+  split(.$settlement) %>% 
+  purrr::map(summary)
