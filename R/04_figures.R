@@ -3,6 +3,7 @@ library(here)
 source(here('R', '00_load-packages.R'))
 source(here('R', '00_vis-custom.R'))
 source(here('R', '01_load-tidy-spat.R'))
+source(here('R', '02_load_tidy-NUT-WQ.R'))
 
 # spat over time ----------------------------------------------------------
 a <- spat %>% 
@@ -33,4 +34,46 @@ ggsave(a, filename = here('output', 'spat-over-time.png'), dpi = 300, units = "i
 
 # monthly water quality parameters over time ------------------------------
 
+WQ %>% 
+  ggplot(aes(x = date, group = station, color = station, fill = station)) +
+  # geom_ribbon(aes(ymin = temp_min, ymax = temp_max), alpha = 0.3) +
+  geom_line(aes(y = temp_mean)) +
+  theme_bw(base_family = "serif") +
+  scale_x_date(date_breaks = "years", date_labels = "%Y") +
+  scale_color_colorblind() +
+  theme(axis.text = element_text(color = "black")) +
+  labs(x = "", 
+       y = "Temperature (\u00b0C)")
 
+WQ %>% 
+  ggplot(aes(x = date, group = station, color = station, fill = station)) +
+  # geom_ribbon(aes(ymin = temp_min, ymax = temp_max), alpha = 0.3) +
+  geom_line(aes(y = sal_mean)) +
+  theme_bw(base_family = "serif") +
+  scale_x_date(date_breaks = "years", date_labels = "%Y") +
+  scale_color_colorblind() +
+  theme(axis.text = element_text(color = "black")) +
+  labs(x = "", 
+       y = "Salinity (psu)")
+
+WQ %>% 
+  ggplot(aes(x = date, group = station, color = station, fill = station)) +
+  # geom_ribbon(aes(ymin = temp_min, ymax = temp_max), alpha = 0.3) +
+  geom_line(aes(y = turb_mean)) +
+  theme_bw(base_family = "serif") +
+  scale_x_date(date_breaks = "years", date_labels = "%Y") +
+  scale_color_colorblind() +
+  theme(axis.text = element_text(color = "black")) +
+  labs(x = "", 
+       y = "Turbidity (NTU)")
+
+WQ %>% 
+  ggplot(aes(x = date, group = station, color = station, fill = station)) +
+  # geom_ribbon(aes(ymin = temp_min, ymax = temp_max), alpha = 0.3) +
+  geom_line(aes(y = chla_n)) +
+  theme_bw(base_family = "serif") +
+  scale_x_date(date_breaks = "years", date_labels = "%Y") +
+  scale_color_colorblind() +
+  theme(axis.text = element_text(color = "black")) +
+  labs(x = "", 
+       y = "Chlorophyll a")
