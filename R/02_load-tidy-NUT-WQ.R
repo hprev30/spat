@@ -276,3 +276,9 @@ ss_1 %>%
 fm_1 %>% 
   split(.$settlement) %>% 
   purrr::map(summary)
+
+
+
+# extra section -----------------------------------------------------------
+
+
