@@ -70,8 +70,9 @@ plot(simulationOutput1)
 simulationOutput2 = recalculateResiduals(res1, group = spat2$year)
 plot(simulationOutput2)
 
-testDispersion(res1)
-testOutliers(mod.1, type = "bootstrap")
+# check for overdispersion
+# 
+performance::check_overdispersion(mod.1)
 
 
 

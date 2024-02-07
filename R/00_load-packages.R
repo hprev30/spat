@@ -24,6 +24,7 @@ library(bbmle)
 library(DHARMa)
 library(car)
 library(emmeans)
+library(performance)
 
 # 04 markdown ----
 # library(knitr)
