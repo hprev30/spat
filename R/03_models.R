@@ -7,10 +7,10 @@ source(here('R', '01_load-tidy-spat.R'))
 # glimpse(spat)
 
 # generalized linear models -----------------------------------------------
-spat <- spat %>% mutate(year = factor(year)) %>% rename(region = region_friendly) # make year a factor and rename region to shorten
+spat2 <- spat %>% mutate(year = factor(year)) %>% rename(region = region_friendly) # make year a factor and rename region to shorten
 
 # region
-mod.0 <- glmmTMB::glmmTMB(spat_std ~ region, data = spat, family = "nbinom2")
+mod.0 <- glmmTMB::glmmTMB(spat_std ~ region, data = spat2, family = "nbinom2")
 summary(mod.0)
 
 # region + year
@@ -22,18 +22,18 @@ mod.2 <- update(mod.1, .~. + region:year)
 summary(mod.2)
 
 # year
-mod.3 <- glmmTMB::glmmTMB(spat_std ~ year, data = spat, family = "nbinom2")
+mod.3 <- glmmTMB::glmmTMB(spat_std ~ year, data = spat2, family = "nbinom2")
 summary(mod.3)
 
 # check out the data
-ggplot(spat, aes(x = region, y = spat_std)) +
+ggplot(spat2, aes(x = region, y = spat_std)) +
   facet_wrap(~year) +
   geom_point(position = "jitter") +
   geom_point(color = "red") +
   theme_bw()
 
-means <- spat %>% group_by(region) %>% summarize(mean = mean(spat_std, na.rm = T)) 
-ggplot(spat, aes(x = region, y = spat_std, group = region)) +
+means <- spat2 %>% group_by(region) %>% summarize(mean = mean(spat_std, na.rm = T)) 
+ggplot(spat2, aes(x = region, y = spat_std, group = region)) +
   geom_point(position = "jitter", color = "gray") +
   geom_point(data = means, aes(x = region, y = mean), color = "black", size = 3) +
   ggrepel::geom_label_repel(data = means, aes(x = region, y = mean, label = round(mean, digits = 2)),
@@ -64,9 +64,16 @@ car::Anova(mod.2)
 # test for autocorrelation
 res1 <- simulateResiduals(mod.1)
 plot(res1)
+simulationOutput1 = recalculateResiduals(res1, group = spat2$region)
+plot(simulationOutput1)
+
+simulationOutput2 = recalculateResiduals(res1, group = spat2$year)
+plot(simulationOutput2)
+
+testDispersion(res1)
 testOutliers(mod.1, type = "bootstrap")
 
-acf(mod.1)
+
 
 # quantify differences ----------------------------------------------------
 # estimated marginal means (least-squares means)
