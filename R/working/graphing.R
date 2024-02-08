@@ -96,13 +96,15 @@ spat %>%
   geom_line() +
   # geom_point() +
   scale_color_manual(name = "Region", values = sitecolours) +
-  theme_bw() +
-  theme(axis.text = element_text(color = "black")) +
-  labs(x = "", y = "Mean spat per shell") +
+  theme_bw(base_family = "serif") +
+  theme(axis.text = element_text(color = "black"),
+        legend.position = "top") +
+  labs(x = "", y = "Mean Spat Per Shell") +
   geom_segment(aes(x = "Apr", y = 200, xend = "Oct", yend = 200), 
                color = "black", size = 2, linetype = "dashed") +
   annotate("text",
            label = "Settlement Period",
            x = "Jul",
-           y = 195)
+           y = 180,
+           family = "serif")
   
