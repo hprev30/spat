@@ -55,20 +55,25 @@ names(modset) <- modnames2
 bbmle::AICctab(modset, weights = TRUE)
 AICcmodavg::aictab(modset, modnames2, second.ord = TRUE) #model selection table with AICc
 
+performance::check_model(mod.1)
 
 # model diagnostics -------------------------------------------------------
 
 # classic ANOVA style table for output (but uses Chi-Square tests)
 car::Anova(mod.2)
 
-# test for autocorrelation
+# test for autocorrelation on full model
 res1 <- simulateResiduals(mod.1)
 plot(res1)
+performance::check_autocorrelation(mod.1)
+
 simulationOutput1 = recalculateResiduals(res1, group = spat2$region)
 plot(simulationOutput1)
 
 simulationOutput2 = recalculateResiduals(res1, group = spat2$year)
 plot(simulationOutput2)
+
+
 
 # check for overdispersion
 # 
