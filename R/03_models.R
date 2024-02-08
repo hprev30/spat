@@ -9,9 +9,9 @@ source(here('R', '01_load-tidy-spat.R'))
 # generalized linear models -----------------------------------------------
 spat2 <- spat %>% mutate(year = factor(year)) %>% rename(region = region_friendly) # make year a factor and rename region to shorten
 
-# intercept only
-mod.0 <- glmmTMB::glmmTMB(spat_count ~ offset(log(soak_time_days)), data = spat2, family = "nbinom2")
-summary(mod)
+# intercept only with log link of soak time days
+mod.0 <- glmmTMB::glmmTMB(spat_count ~ 0 + offset(log(soak_time_days)), data = spat2, family = "nbinom2")
+summary(mod.0)
 
 # region
 mod.1 <- update(mod.0, .~. + region)
@@ -61,33 +61,28 @@ AICcmodavg::aictab(modset, modnames2, second.ord = TRUE) #model selection table 
 
 performance::check_model(mod.2)
 
-# model diagnostics -------------------------------------------------------
-
-# classic ANOVA style table for output (but uses Chi-Square tests)
-car::Anova(mod.2)
-# interaction
-car::Anova(mod.3)
-
-Anova.glmmTMB(mod.2)
-
 # test for autocorrelation on full model
 res1 <- simulateResiduals(mod.2)
 plot(res1)
 performance::check_autocorrelation(mod.2)
 
+# calculating aggregated residuals per group
 simulationOutput1 = recalculateResiduals(res1, group = spat2$region)
 plot(simulationOutput1)
 
 simulationOutput2 = recalculateResiduals(res1, group = spat2$year)
 plot(simulationOutput2)
 
-
-
 # check for overdispersion
 # 
 performance::check_overdispersion(mod.2)
 
+# model diagnostics -------------------------------------------------------
 
+# classic ANOVA style table for output (but uses Chi-Square tests)
+car::Anova(mod.2)
+# interaction
+car::Anova(mod.2)
 
 # quantify differences ----------------------------------------------------
 # estimated marginal means (least-squares means)
