@@ -98,32 +98,3 @@ ggplot(spat2, aes(x = region, y = spat_count)) +
   geom_point(color = "red") +
   theme_bw()
 
-means <- spat %>% group_by(region_friendly) %>% summarize(mean = mean(spat_count, na.rm = T)) 
-a <- spat %>% 
-  ggplot(aes(x = region_friendly, y = spat_count, color = region_friendly)) +
-  geom_jitter(alpha = 0.5, width = 0.2, size = 2) +
-  geom_point(data = means, aes(x = region_friendly, y = mean), color = "black", size = 4) +
-  scale_color_manual(values = sitecolours) +
-  ggrepel::geom_label_repel(data = means, aes(x = region_friendly, y = mean, label = round(mean, digits = 2),
-                                              family = "serif"), size = 3.3,
-                            nudge_y = 2.5, nudge_x = 0.2, color = "black") +
-  theme_bw(base_family = "serif") +
-  theme(axis.text = element_text(color = "black"),
-        legend.position = "none") +
-  labs(x = "Region", y = "Mean Spat Per Shell")
-
-means2 <- spat %>% group_by(year) %>% summarize(mean = mean(spat_count, na.rm = T)) 
-b <- spat %>% 
-  ggplot(aes(x = year, y = spat_count)) +
-  geom_jitter(alpha = 0.5, width = 0.2, size = 2, color = "gray50") +
-  geom_point(data = means2, aes(x = year, y = mean), color = "black", size = 4) +
-  ggrepel::geom_label_repel(data = means2, aes(x = year, y = mean, label = round(mean, digits = 2),
-                                               family = "serif"), size = 3.3,
-                            nudge_y = 2.5, nudge_x = 0.2, color = "black") +
-  scale_x_continuous(breaks = c(2015, 2016, 2017, 2018, 2019, 2020)) +
-  theme_bw(base_family = "serif") +
-  theme(axis.text = element_text(color = "black"),
-        legend.position = "none") +
-  labs(x = "Year", y = "Mean Spat Per Shell")
-
-(a + labs(title = "A")) + (b + labs(y = "", title = "B"))
