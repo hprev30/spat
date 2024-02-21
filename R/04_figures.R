@@ -3,16 +3,16 @@ library(here)
 source(here('R', '00_load-packages.R'))
 source(here('R', '00_vis-custom.R'))
 source(here('R', '01_load-tidy-spat.R'))
-source(here('R', '02_load_tidy-NUT-WQ.R'))
+source(here('R', '02_load-tidy-NUT-WQ.R'))
 
 # spat over time ----------------------------------------------------------
 a <- spat %>% 
   group_by(soak_month, region_friendly) %>% 
   summarise(mean = mean(spat_count, na.rm = T),
             se = (sd(spat_count, na.rm = T)/sqrt(length(spat_count)))
-  ) %>% 
+  ) %>%
   ggplot(aes(x = soak_month, y = mean, group = region_friendly, color = region_friendly)) +
-  geom_point() +
+  geom_line() +
   geom_errorbar(aes(ymin = mean - se, ymax = mean + se)) +
   scale_colour_manual(name = "Region", values = sitecolours) +
   scale_x_date(date_breaks = "years", date_labels = "%Y", date_minor_breaks = "months") +
@@ -21,7 +21,71 @@ a <- spat %>%
         axis.text = element_text(color = "black")) +
   labs(x = "", y = "Mean Spat Per Shell")
 
-ggsave(a, filename = here('output', 'spat-over-time.png'), dpi = 300, units = "in", width = 5, height = 3)
+ggsave(a, filename = here('output', 'spat-over-time.png'), dpi = 300, units = "in", width = 7, height = 3)
+
+
+b <- spat %>% 
+  group_by(soak_month, region_friendly) %>% 
+  summarise(mean = mean(spat_count, na.rm = T),
+            se = (sd(spat_count, na.rm = T)/sqrt(length(spat_count)))
+  ) %>%
+  filter(soak_month > as.Date('2015-01-01') & soak_month < as.Date('2017-01-01')) %>% 
+  ggplot(aes(x = soak_month, y = mean, group = region_friendly, color = region_friendly)) +
+  geom_line() +
+  geom_point() +
+  # geom_errorbar(aes(ymin = mean - se, ymax = mean + se), alpha = 0.7) +
+  scale_colour_manual(name = "Region", values = sitecolours) +
+  # scale_y_continuous(limits = c(0,450)) +
+  scale_x_date(date_breaks = "years", date_labels = "%Y", date_minor_breaks = "months") +
+  theme_bw(base_family = "serif") +
+  theme(legend.position = "top",
+        axis.text = element_text(color = "black")) +
+  labs(x = "", y = "Mean Spat Per Shell")
+
+c <- spat %>% 
+  group_by(soak_month, region_friendly) %>% 
+  summarise(mean = mean(spat_count, na.rm = T),
+            se = (sd(spat_count, na.rm = T)/sqrt(length(spat_count)))
+  ) %>%
+  filter(soak_month > as.Date('2017-01-01') & soak_month < as.Date('2019-01-01')) %>% 
+  ggplot(aes(x = soak_month, y = mean, group = region_friendly, color = region_friendly)) +
+  geom_line() +
+  geom_point() +
+  # geom_errorbar(aes(ymin = mean - se, ymax = mean + se), alpha = 0.7) +
+  scale_colour_manual(name = "Region", values = sitecolours) +
+  # scale_y_continuous(limits = c(0,450)) +
+  scale_x_date(date_breaks = "years", date_labels = "%Y", date_minor_breaks = "months") +
+  theme_bw(base_family = "serif") +
+  theme(legend.position = "top",
+        axis.text = element_text(color = "black")) +
+  labs(x = "", y = "Mean Spat Per Shell")
+
+d <- spat %>% 
+  group_by(soak_month, region_friendly) %>% 
+  summarise(mean = mean(spat_count, na.rm = T),
+            se = (sd(spat_count, na.rm = T)/sqrt(length(spat_count)))
+  ) %>%
+  filter(soak_month > as.Date('2019-01-01') & soak_month < as.Date('2021-01-01')) %>% 
+  ggplot(aes(x = soak_month, y = mean, group = region_friendly, color = region_friendly)) +
+  geom_line() +
+  geom_point() +
+  # geom_errorbar(aes(ymin = mean - se, ymax = mean + se), alpha = 0.7) +
+  scale_colour_manual(name = "Region", values = sitecolours) +
+  # scale_y_continuous(limits = c(0,450)) +
+  scale_x_date(date_breaks = "years", date_labels = "%Y", date_minor_breaks = "months") +
+  theme_bw(base_family = "serif") +
+  theme(legend.position = "top",
+        axis.text = element_text(color = "black")) +
+  labs(x = "", y = "Mean Spat Per Shell")
+
+fig3 <- 
+(b + theme(legend.position = "none") + labs(y = "")) / 
+  (c + theme(legend.position = "none")) / 
+  (d + theme(legend.position = "bottom") + labs(y = ""))
+
+ggsave(fig3, filename = here('output', 'figure3.png'), dpi = 600, 
+       units = "in", width = 5.5)
+
 
 # spat by region with stats -----------------------------------------------
 
@@ -128,10 +192,16 @@ b <- spat %>%
 
 # combine spat by region and year into one side-by-side plot --------------
 
+fig4 <-
 (a + labs(title = "A")) + (b + labs(y = "", title = "B"))
+
+ggsave(fig4, filename = here('output', 'figure4.png'),
+       dpi = 600, units = "in",
+       width = 7, height = 3.5)
 
 # settlement period -------------------------------------------------------
 
+fig5 <- 
 spat %>% 
   mutate(month = month(soak_month, label = T)) %>% 
   group_by(region_friendly, month)  %>% 
@@ -151,6 +221,10 @@ spat %>%
            x = "Jul",
            y = 180,
            family = "serif")
+
+ggsave(fig5, filename = here('output', 'figure5.png'),
+       dpi = 600, units = "in", 
+       width = 5.5, height = 3)
 
 # monthly water quality parameters over time ------------------------------
 
@@ -208,8 +282,12 @@ WQ %>%
        y = "Chlorophyll a (\U00B5g/L)",
        title = "D")
 
+fig6 <-
 (wq_a + wq_b) / (wq_c + wq_d)
 
+ggsave(fig6, filename = here('output', 'figure6.png'),
+       dpi = 600, units = "in",
+       height = 4.5, width = 7)
 
 # special call out
 
@@ -239,4 +317,9 @@ wq_b2 <-
        y = "Turbidity (NTU)",
        title = "B")
 
+fig7 <-
 wq_a2 / wq_b2
+
+ggsave(fig7, filename = here('output', 'figure7.png'),
+       dpi = 600, units = "in",
+       width = 5.5, height = 4)
