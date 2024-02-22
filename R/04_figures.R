@@ -30,9 +30,11 @@ b <- spat %>%
             se = (sd(spat_count, na.rm = T)/sqrt(length(spat_count)))
   ) %>%
   filter(soak_month > as.Date('2015-01-01') & soak_month < as.Date('2017-01-01')) %>% 
-  ggplot(aes(x = soak_month, y = mean, group = region_friendly, color = region_friendly)) +
-  geom_line() +
-  geom_point() +
+  ggplot(aes(x = soak_month, y = mean)) +
+  geom_ribbon(aes(xmin = as.Date('2016-09-01'), xmax = as.Date('2016-10-01')),
+              fill = "gray90") +
+  geom_line(aes(group = region_friendly, color = region_friendly)) +
+  geom_point(aes(, group = region_friendly, color = region_friendly)) +
   # geom_errorbar(aes(ymin = mean - se, ymax = mean + se), alpha = 0.7) +
   scale_colour_manual(name = "Region", values = sitecolours) +
   # scale_y_continuous(limits = c(0,450)) +
