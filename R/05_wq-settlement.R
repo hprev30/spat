@@ -89,4 +89,22 @@ fm_1 %>%
             chl = fun_se(chla_n))
 # extra section -----------------------------------------------------------
 
+# standard dev
+
+fun_se <- function(x) (sd(x, na.rm = T)/sqrt(length(x)))
+
+pi_1 %>% 
+  select(settlement, temp, sal, turb, chla_n) %>% 
+  group_by(settlement) %>% 
+  summarise_all(list(~ mean(., na.rm = T), ~ sd(., na.rm = T)))
+
+ss_1 %>% 
+  select(settlement, temp, sal, turb, chla_n) %>% 
+  group_by(settlement) %>% 
+  summarise_all(list(~ mean(., na.rm = T), ~ sd(., na.rm = T)))
+
+fm_1 %>% 
+  select(settlement, temp, sal, turb, chla_n) %>% 
+  group_by(settlement) %>% 
+  summarise_all(list(~ mean(., na.rm = T), ~ sd(., na.rm = T)))
 
