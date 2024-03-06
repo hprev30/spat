@@ -4,15 +4,6 @@ source(here('R', '00_load-packages.R'))
 source(here('R', '00_vis-custom.R'))
 source(here('R', '01_load-tidy-spat.R'))
 
-library(glmmTMB)
-library(bbmle)
-library(ggeffects)
-library(AICcmodavg)
-library(emmeans)
-library(DHARMa)
-library(readr)
-library(jtools)
-
 # glimpse(spat)
 
 # generalized linear models -----------------------------------------------
