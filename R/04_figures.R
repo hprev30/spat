@@ -303,7 +303,7 @@ wq_a2 <-
   theme(legend.position = "none",
         axis.text = element_text(color = "black")) +
   labs(x = "", 
-       y = "Salinity (psu)",
+       y = "Monthly Minimum\nSalinity (psu)",
        title = "A")
 wq_b2 <-
   WQ %>% 
@@ -316,7 +316,7 @@ wq_b2 <-
   theme(legend.position = "bottom",
         axis.text = element_text(color = "black")) +
   labs(x = "", 
-       y = "Turbidity (NTU)",
+       y = "Monthly Maximum\nTurbidity (NTU)",
        title = "B")
 
 fig7 <-
@@ -324,4 +324,4 @@ wq_a2 / wq_b2
 
 ggsave(fig7, filename = here('output', 'figure7.png'),
        dpi = 600, units = "in",
-       width = 5.5, height = 4)
+       width = 5.5, height = 5)

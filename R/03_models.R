@@ -43,6 +43,9 @@ bbmle::AICctab(modset, weights = TRUE)
 AICcmodavg::aictab(modset, modnames2, second.ord = TRUE) #model selection table with AICc
 
 performance::check_model(mod.2)
+diagnose(mod.2)
+
+plot_summs(mod.2)
 
 # compare models
 anova(mod.0, mod.1, mod.2, mod.3, mod.4)
@@ -50,16 +53,16 @@ anova(mod.0, mod.1, mod.2, mod.3, mod.4)
 # model diagnostics -------------------------------------------------------
 
 # test for autocorrelation on full model
-res1 <- simulateResiduals(mod.2)
-plot(res1)
-performance::check_autocorrelation(mod.2)
+res <- DHARMa::simulateResiduals(mod.2)
+plot(res)
+testResiduals(res)
 
-# calculating aggregated residuals per group
-simulationOutput1 = recalculateResiduals(res1, group = spat2$region)
-plot(simulationOutput1)
+performance::check_autocorrelation(mod.2) # Durbin-Watson-Test
 
-simulationOutput2 = recalculateResiduals(res1, group = spat2$year)
-plot(simulationOutput2)
+agg.res = recalculateResiduals(res,group=spat2$year)
+time = unique(spat2$year)
+plot(time,agg.res1$scaledResiduals,pch=16)
+testTemporalAutocorrelation(agg.res, time = time)
 
 # check for overdispersion
 performance::check_overdispersion(mod.2)

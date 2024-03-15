@@ -72,10 +72,7 @@ soakdays <- spat_dat2 %>%
   # `spat` dataframe for spat analysis
     # group_by: soak_month and region_friendly and tree
     # summarize: spat_count = ceiling(mean(adj_spat, na.rm = T)) to get average spat per shell per tree rounded to integer
-# to standardize by soak days
-    # left_join with soak days by retrieval_date, region_friendly, tree to be able to bring back in `soak_time_days` from original df
-    # mutate: spat_std = ceiling(spat_count/soak_time_days) # to get a new variable of average spat per shell per tree per deployment period rounded to integer
-    # ungroup dataframe
+
 
 spat <- spat_dat2 %>% 
   group_by(soak_month, region_friendly, tree) %>% 
@@ -85,12 +82,6 @@ spat <- spat_dat2 %>%
          year = lubridate::year(soak_month)) %>%  # creates a year variable
   ungroup()
 
-  # group_by(soak_month, region_friendly) %>% 
-  # summarise(spat_count_region = ceiling(mean(spat_count, na.rm = T)),
-  #           spat_count_sd = ceiling(sd(spat_count, na.rm = T)),
-  #           spat_count_se = ceiling((sd(spat_count, na.rm = T)/sqrt(length(spat_count))))
-  #           ) %>% 
-  # ungroup()
 
 
 # check sampling design ---------------------------------------------------
