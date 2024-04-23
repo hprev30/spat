@@ -10,15 +10,15 @@
 # load data, qaqc to remove suspect or rejected values
 # aggregate data to monthly medians for temp, sal, turb
 
-pi <- SWMPr::import_local(here('data', 'swmp','59698.zip'), 
+pi <- SWMPr::import_local(here('data', 'swmp','581067.zip'), 
                           station_code = 'gtmpiwq') %>% 
   SWMPr::qaqc(qaqc_keep = c('0', '2', '3', '4', '5')) 
 
-ss <- SWMPr::import_local(here('data', 'swmp','59698.zip'), 
+ss <- SWMPr::import_local(here('data', 'swmp','581067.zip'), 
                           station_code = 'gtmsswq') %>% 
   SWMPr::qaqc(qaqc_keep = c('0', '2', '3', '4', '5'))  
 
-fm <- SWMPr::import_local(here('data', 'swmp','59698.zip'), 
+fm <- SWMPr::import_local(here('data', 'swmp','581067.zip'), 
                           station_code = 'gtmfmwq') %>% 
   SWMPr::qaqc(qaqc_keep = c('0', '2', '3', '4', '5')) 
 
