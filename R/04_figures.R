@@ -31,8 +31,9 @@ b <- spat %>%
   ) %>%
   filter(soak_month > as.Date('2015-01-01') & soak_month < as.Date('2017-01-01')) %>% 
   ggplot(aes(x = soak_month, y = mean)) +
-  geom_ribbon(aes(xmin = as.Date('2016-09-01'), xmax = as.Date('2016-10-01')),
+  geom_ribbon(aes(xmin = as.Date('2016-08-15'), xmax = as.Date('2016-10-15')),
               fill = "gray90") +
+  geom_vline(xintercept = as.Date("2016-10-07"), linetype = "dashed") +
   geom_line(aes(group = region_friendly, color = region_friendly)) +
   geom_point(aes(, group = region_friendly, color = region_friendly)) +
   # geom_errorbar(aes(ymin = mean - se, ymax = mean + se), alpha = 0.7) +
@@ -42,7 +43,12 @@ b <- spat %>%
   theme_bw(base_family = "serif") +
   theme(legend.position = "top",
         axis.text = element_text(color = "black")) +
-  labs(x = "", y = "Mean Spat Per Shell")
+  labs(x = "", y = "Mean Spat Per Shell") +
+  annotate("text",
+           label = "A",
+           family = "serif",
+           x = as.Date("2016-10-15"), 
+           y = 60)
 
 c <- spat %>% 
   group_by(soak_month, region_friendly) %>% 
@@ -51,6 +57,7 @@ c <- spat %>%
   ) %>%
   filter(soak_month > as.Date('2017-01-01') & soak_month < as.Date('2019-01-01')) %>% 
   ggplot(aes(x = soak_month, y = mean, group = region_friendly, color = region_friendly)) +
+  geom_vline(xintercept = as.Date("2017-09-11"), linetype = "dashed") +
   geom_line() +
   geom_point() +
   # geom_errorbar(aes(ymin = mean - se, ymax = mean + se), alpha = 0.7) +
@@ -60,7 +67,12 @@ c <- spat %>%
   theme_bw(base_family = "serif") +
   theme(legend.position = "top",
         axis.text = element_text(color = "black")) +
-  labs(x = "", y = "Mean Spat Per Shell")
+  labs(x = "", y = "Mean Spat Per Shell") +
+  annotate("text",
+           label = "B",
+           family = "serif",
+           x = as.Date("2017-09-20"), 
+           y = 120)
 
 d <- spat %>% 
   group_by(soak_month, region_friendly) %>% 
@@ -69,6 +81,7 @@ d <- spat %>%
   ) %>%
   filter(soak_month > as.Date('2019-01-01') & soak_month < as.Date('2021-01-01')) %>% 
   ggplot(aes(x = soak_month, y = mean, group = region_friendly, color = region_friendly)) +
+  geom_vline(xintercept = as.Date("2019-09-04"), linetype = "dashed") +
   geom_line() +
   geom_point() +
   # geom_errorbar(aes(ymin = mean - se, ymax = mean + se), alpha = 0.7) +
@@ -78,15 +91,23 @@ d <- spat %>%
   theme_bw(base_family = "serif") +
   theme(legend.position = "top",
         axis.text = element_text(color = "black")) +
-  labs(x = "", y = "Mean Spat Per Shell")
+  labs(x = "", y = "Mean Spat Per Shell") +
+  annotate("text",
+           label = "C",
+           family = "serif",
+           x = as.Date("2019-09-15"), 
+           y = 300)
 
 fig3 <- 
 (b + theme(legend.position = "none") + labs(y = "")) / 
   (c + theme(legend.position = "none")) / 
   (d + theme(legend.position = "bottom") + labs(y = ""))
 
-ggsave(fig3, filename = here('output', 'figure3.png'), dpi = 600, 
-       units = "in", width = 5.5)
+ggsave(fig3, filename = here('output', 'figure3-2.png'), 
+       dpi = 600, 
+       units = "in", 
+       height = 6.08,
+       width = 5.5)
 
 
 # spat by region with stats -----------------------------------------------
@@ -234,6 +255,9 @@ wq_a <-
 WQ %>% 
   ggplot(aes(x = date, group = station, color = station)) +
   # geom_ribbon(aes(ymin = temp_min, ymax = temp_max), alpha = 0.3) +
+  geom_vline(xintercept = as.Date("2016-10-07"), linetype = "dashed") +
+  geom_vline(xintercept = as.Date("2017-09-11"), linetype = "dashed") +
+  geom_vline(xintercept = as.Date("2019-09-04"), linetype = "dashed") +
   geom_line(aes(y = temp_mean)) +
   theme_bw(base_family = "serif") +
   scale_x_date(date_breaks = "years", date_labels = "%Y") +
@@ -242,11 +266,29 @@ WQ %>%
         axis.text = element_text(color = "black")) +
   labs(x = "", 
        y = "Temperature (\u00b0C)",
-       title = "A")
+       title = "A") +
+  annotate("text",
+           label = "a",
+           family = "serif",
+           x = as.Date("2016-12-01"),
+           y = 30) +
+  annotate("text",
+           label = "b",
+           family = "serif",
+           x = as.Date("2017-11-01"),
+           y = 30) +
+  annotate("text",
+           label = "c",
+           family = "serif",
+           x = as.Date("2019-11-01"),
+           y = 30)
 
 wq_b <- 
 WQ %>% 
   ggplot(aes(x = date, group = station, color = station)) +
+  geom_vline(xintercept = as.Date("2016-10-07"), linetype = "dashed") +
+  geom_vline(xintercept = as.Date("2017-09-11"), linetype = "dashed") +
+  geom_vline(xintercept = as.Date("2019-09-04"), linetype = "dashed") +
   geom_line(aes(y = sal_mean)) +
   theme_bw(base_family = "serif") +
   scale_x_date(date_breaks = "years", date_labels = "%Y") +
@@ -255,11 +297,30 @@ WQ %>%
         axis.text = element_text(color = "black")) +
   labs(x = "", 
        y = "Salinity (psu)",
-       title = "B")
+       title = "B") +
+  annotate("text",
+           label = "a",
+           family = "serif",
+           x = as.Date("2016-12-01"),
+           y = 37) +
+  annotate("text",
+           label = "b",
+           family = "serif",
+           x = as.Date("2017-11-01"),
+           y = 37) +
+  annotate("text",
+           label = "c",
+           family = "serif",
+           x = as.Date("2019-11-01"),
+           y = 37)
+
 wq_c <-
 WQ %>% 
   ggplot(aes(x = date, group = station, color = station)) +
   # geom_ribbon(aes(ymin = temp_min, ymax = temp_max), alpha = 0.3) +
+  geom_vline(xintercept = as.Date("2016-10-07"), linetype = "dashed") +
+  geom_vline(xintercept = as.Date("2017-09-11"), linetype = "dashed") +
+  geom_vline(xintercept = as.Date("2019-09-04"), linetype = "dashed") +
   geom_line(aes(y = turb_mean)) +
   theme_bw(base_family = "serif") +
   scale_x_date(date_breaks = "years", date_labels = "%Y") +
@@ -268,12 +329,30 @@ WQ %>%
         axis.text = element_text(color = "black")) +
   labs(x = "", 
        y = "Turbidity (NTU)",
-       title = "C")
+       title = "C") +
+  annotate("text",
+           label = "a",
+           family = "serif",
+           x = as.Date("2016-12-01"),
+           y = 24) +
+  annotate("text",
+           label = "b",
+           family = "serif",
+           x = as.Date("2017-11-01"),
+           y = 24) +
+  annotate("text",
+           label = "c",
+           family = "serif",
+           x = as.Date("2019-11-01"),
+           y = 24)
 
 wq_d <-
 WQ %>% 
   ggplot(aes(x = date, group = station, color = station)) +
   # geom_ribbon(aes(ymin = temp_min, ymax = temp_max), alpha = 0.3) +
+  geom_vline(xintercept = as.Date("2016-10-07"), linetype = "dashed") +
+  geom_vline(xintercept = as.Date("2017-09-11"), linetype = "dashed") +
+  geom_vline(xintercept = as.Date("2019-09-04"), linetype = "dashed") +
   geom_line(aes(y = chla_n), size = 0.7) +
   theme_bw(base_family = "serif") +
   scale_x_date(date_breaks = "years", date_labels = "%Y") +
@@ -282,12 +361,27 @@ WQ %>%
         axis.text = element_text(color = "black")) +
   labs(x = "", 
        y = "Chlorophyll a (\U00B5g/L)",
-       title = "D")
+       title = "D") +
+  annotate("text",
+           label = "a",
+           family = "serif",
+           x = as.Date("2016-12-01"),
+           y = 15) +
+  annotate("text",
+           label = "b",
+           family = "serif",
+           x = as.Date("2017-11-01"),
+           y = 15) +
+  annotate("text",
+           label = "c",
+           family = "serif",
+           x = as.Date("2019-11-01"),
+           y = 15)
 
 fig6 <-
 (wq_a + wq_b) / (wq_c + wq_d)
 
-ggsave(fig6, filename = here('output', 'figure6.png'),
+ggsave(fig6, filename = here('output', 'figure6-2.png'),
        dpi = 600, units = "in",
        height = 4.5, width = 7)
 
@@ -296,6 +390,9 @@ ggsave(fig6, filename = here('output', 'figure6.png'),
 wq_a2 <- 
   WQ %>% 
   ggplot(aes(x = date, group = station, color = station)) +
+  geom_vline(xintercept = as.Date("2016-10-07"), linetype = "dashed") +
+  geom_vline(xintercept = as.Date("2017-09-11"), linetype = "dashed") +
+  geom_vline(xintercept = as.Date("2019-09-04"), linetype = "dashed") +
   geom_line(aes(y = sal_min)) +
   theme_bw(base_family = "serif") +
   scale_x_date(date_breaks = "years", date_labels = "%Y") +
@@ -304,11 +401,29 @@ wq_a2 <-
         axis.text = element_text(color = "black")) +
   labs(x = "", 
        y = "Monthly Minimum\nSalinity (psu)",
-       title = "A")
+       title = "A") +
+  annotate("text",
+           label = "a",
+           family = "serif",
+           x = as.Date("2016-12-01"),
+           y = 37) +
+  annotate("text",
+           label = "b",
+           family = "serif",
+           x = as.Date("2017-11-01"),
+           y = 37) +
+  annotate("text",
+           label = "c",
+           family = "serif",
+           x = as.Date("2019-11-01"),
+           y = 37)
 wq_b2 <-
   WQ %>% 
   ggplot(aes(x = date, group = station, color = station)) +
   # geom_ribbon(aes(ymin = temp_min, ymax = temp_max), alpha = 0.3) +
+  geom_vline(xintercept = as.Date("2016-10-07"), linetype = "dashed") +
+  geom_vline(xintercept = as.Date("2017-09-11"), linetype = "dashed") +
+  geom_vline(xintercept = as.Date("2019-09-04"), linetype = "dashed") +
   geom_line(aes(y = turb_max)) +
   theme_bw(base_family = "serif") +
   scale_x_date(date_breaks = "years", date_labels = "%Y") +
@@ -317,11 +432,26 @@ wq_b2 <-
         axis.text = element_text(color = "black")) +
   labs(x = "", 
        y = "Monthly Maximum\nTurbidity (NTU)",
-       title = "B")
+       title = "B") +
+  annotate("text",
+           label = "a",
+           family = "serif",
+           x = as.Date("2016-12-01"),
+           y = 320) +
+  annotate("text",
+           label = "b",
+           family = "serif",
+           x = as.Date("2017-11-01"),
+           y = 320) +
+  annotate("text",
+           label = "c",
+           family = "serif",
+           x = as.Date("2019-11-01"),
+           y = 320)
 
 fig7 <-
 wq_a2 / wq_b2
 
-ggsave(fig7, filename = here('output', 'figure7.png'),
+ggsave(fig7, filename = here('output', 'figure7-2.png'),
        dpi = 600, units = "in",
        width = 5.5, height = 5)
