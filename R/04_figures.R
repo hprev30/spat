@@ -45,7 +45,7 @@ b <- spat %>%
         axis.text = element_text(color = "black")) +
   labs(x = "", y = "Mean Spat Per Shell") +
   annotate("text",
-           label = "A",
+           label = "a",
            family = "serif",
            x = as.Date("2016-10-15"), 
            y = 60)
@@ -69,7 +69,7 @@ c <- spat %>%
         axis.text = element_text(color = "black")) +
   labs(x = "", y = "Mean Spat Per Shell") +
   annotate("text",
-           label = "B",
+           label = "b",
            family = "serif",
            x = as.Date("2017-09-20"), 
            y = 120)
@@ -93,7 +93,7 @@ d <- spat %>%
         axis.text = element_text(color = "black")) +
   labs(x = "", y = "Mean Spat Per Shell") +
   annotate("text",
-           label = "C",
+           label = "c",
            family = "serif",
            x = as.Date("2019-09-15"), 
            y = 300)
