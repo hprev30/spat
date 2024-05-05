@@ -4,9 +4,9 @@ by [Shannon D. Kimmel](https://github.com/skdunnigan), [Hans J. Prevost](https:/
 
 This repository contains the data and source code used to produce the results presented in:
 
-|                   | Info          |
-|------------------:|:--------------|
-| Version of record | *coming soon* |
+|                   | Info                                   |
+|------------------:|:---------------------------------------|
+| Version of record | <https://doi.org/10.3390/jmse12050766> |
 
 # About
 
